@@ -15,6 +15,9 @@ jobs:
         - name: git
           working-directory: ~/vulnerable-container-hub
           run: |
+           pwd
+           echo ~
+           ls
            git submodule init
            git submodule update
 
