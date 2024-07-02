@@ -36,4 +36,4 @@ jobs:
           uses: microsoft/security-devops-action@latest
           id: msdo
           with:
-            include-tools: container-mapping
+            includeTools: container-mapping
