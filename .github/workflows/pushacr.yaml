@@ -31,3 +31,9 @@ jobs:
             docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
           working-directory: vulnerable-container-hub/ctf/CTF-web-to-system-01
+        
+        - name: Run MDO analysis
+          uses: microsoft/security-devops-action@latest
+          id: msdo
+          with:
+            include-tools: container-mapping
