@@ -1,0 +1,31 @@
+name: Build and push to ACR
+
+on:
+    push:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@main
+        
+        - name: git
+          working-directory: ./vulnerable-container-hub
+          run: |
+           git submodule init
+           git submodule update
+
+        
+        - name: Build and push image
+          uses: azure/docker-login@v1
+          with:
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+            login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        - run: |
+            docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+          working-directory: ./ctf/CTF-web-to-system-01
