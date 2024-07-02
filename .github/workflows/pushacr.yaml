@@ -28,4 +28,4 @@ jobs:
         - run: |
             docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-          working-directory: ctf/CTF-web-to-system-01
+          working-directory: vulnerable-container-hub/ctf/CTF-web-to-system-01
