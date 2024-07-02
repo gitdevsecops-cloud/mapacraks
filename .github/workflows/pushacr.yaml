@@ -15,7 +15,8 @@ jobs:
         - name: git
           #working-directory: vulnerable-container-hub
           run: |
-           cd ./vulnerable-container-hub 
+           git clone https://github.com/OWASP/vulnerable-container-hub
+           cd ./vulnerable-container-hub/
            git submodule init
            git submodule update
 
