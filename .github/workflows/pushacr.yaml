@@ -13,7 +13,7 @@ jobs:
           uses: actions/checkout@main
         
         - name: git
-          working-directory: vulnerable-container-hub
+          working-directory: ~/vulnerable-container-hub
           run: |
            git submodule init
            git submodule update
