@@ -13,11 +13,8 @@ jobs:
           uses: actions/checkout@main
         
         - name: git
-          working-directory: ~/vulnerable-container-hub
+          working-directory: ./vulnerable-container-hub
           run: |
-           pwd
-           echo ~
-           ls
            git submodule init
            git submodule update
 
@@ -31,4 +28,4 @@ jobs:
         - run: |
             docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-          working-directory: ctf/CTF-web-to-system-01
+          working-directory: ./ctf/CTF-web-to-system-01
