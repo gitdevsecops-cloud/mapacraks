@@ -48,6 +48,9 @@ jobs:
                 ignore-unfixed: true
                 vuln-type: 'os'
                 severity: 'CRITICAL,HIGH'
+              env:
+                TRIVY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+                TRIVY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
             - name: 'Check vulnerability Count'
               id: vuln_count
