@@ -1,0 +1,94 @@
+# COPA https://project-copacetic.github.io/copacetic/website/
+
+name: build-scan-fix-push
+
+on:
+    push: 
+        branches: ["main"]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    patch:
+        permissions:
+            contents: read # for actions/checkout to fetch code
+            packages: write
+            security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+            actions: read # only required for a private repository by hub/codeql-action/upload-sarif to get the Action run status
+        name: patch
+        runs-on: ubuntu-latest
+    
+        strategy:
+            fail-fast: false
+            matrix:
+                images: ['acrwesdemo001.azurecr.io/backend:v1.0.1']
+    
+        steps:
+            - name: 'Docker login'
+              uses: azure/docker-login@v1
+              with:
+                login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+                username: ${{ secrets.REGISTRY_USERNAME }}
+                password: ${{ secrets.REGISTRY_PASSWORD }}
+            
+            - name: 'login to azure'
+              id: login
+              uses: azure/login@v1
+              with:
+                creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+            - name: 'Run trivy scanner'
+              uses: aquasecurity/trivy-action@master
+              with:
+                image-ref: ${{ matrix.images }}
+                format: 'json'
+                output: 'trivy-results.json'
+                ignore-unfixed: true
+                vuln-type: 'os'
+                severity: 'CRITICAL,HIGH'
+
+            - name: 'Check vulnerability Count'
+              id: vuln_count
+              run: |
+               report_file="trivy-results.json"
+               vuln_count=$(jq 'if .Results then [.Results[] | select(.Class=="os-pkgs" and .Vulnerabilities!=null) | .Vulnerabilities[]] | length else 0 end' "$report_file")
+               echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
+
+            - name: 'Copa patch'
+              if: steps.vuln_count.outputs.vuln_count > 0
+              id: copa_patch
+              run: |
+               wget https://github.com/project-copacetic/copacetic/releases/download/v${COPA_VERSION}/copa_${COPA_VERSION}_linux_amd64.tar.gz
+               tar -xzf copa_${COPA_VERSION}_linux_amd64.tar.gz
+               chmod +x copa
+               
+               imageName=$(echo ${{ matrix.images }} | cut -d ':' -f1)
+               current_tag=$(echo $${{ matrix.images }} | cut -d ':' -f2)
+
+               major=$(echo $current_tag | awk -F. '{print $1}')
+               minor=$(echo $current_tag | awk -F. '{print $2}')
+               patch=$(echo $current_tag | awk -F. '{print $3}')
+               ((patch++))
+
+               new_tag="$major.$minor.$patch"
+               patched_tag=$new_tag
+
+               echo "patched_tag=$new_tag" >> $GITHUB_OUTPUT
+               echo "imageName=$imageName" >> $GITHUB_OUTPUT
+
+               docker buildx create --use --name builder
+               ./copa patch -i ${{ matrix.images }} -r trivy-results.json -t $patched_tag
+               echo "copa_patch=true" >> $GITHUB_OUPUT
+              env:
+                COPA_VERSION: 0.6.0
+
+            - name: 'push patched image'
+              if: steps.vuln_count.outputs.vuln_count != '0'
+              run: |
+               docker push ${{ steps.copa_patch.outputs.imageName }}:${{ steps.copa_patch.outputs.patched_tag }}
+
+
+
+
