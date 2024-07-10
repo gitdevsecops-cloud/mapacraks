@@ -42,7 +42,8 @@ jobs:
             - name: 'Run trivy scanner'
               uses: aquasecurity/trivy-action@master
               with:
-                image-ref: ${{ matrix.images }}
+                #image-ref: ${{ matrix.images }}
+                image-ref: 'abhiacreastus.azurecr.io/vulnerableimage:v0.0.1'
                 format: 'json'
                 output: 'trivy-results.json'
                 ignore-unfixed: true
