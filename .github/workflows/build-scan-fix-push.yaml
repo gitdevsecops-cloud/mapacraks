@@ -23,7 +23,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                images: ['acrwesdemo001.azurecr.io/backend:v1.0.1']
+                images: ['abhiacreastus.azurecr.io/vulnerableimage:v0.0.1']
     
         steps:
             - name: 'Docker login'
