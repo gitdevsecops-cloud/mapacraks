@@ -27,7 +27,7 @@ jobs:
     
         steps:
             - name: 'Docker login'
-              uses: azure/docker-login@v1
+              uses: azure/docker-login@v2
               with:
                 login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
                 username: ${{ secrets.REGISTRY_USERNAME }}
