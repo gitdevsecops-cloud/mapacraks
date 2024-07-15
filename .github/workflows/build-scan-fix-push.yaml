@@ -23,7 +23,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                images: ['abhiacreastus.azurecr.io/vulnerableimage:0.0.1']
+                images: ['abhiacreastus.azurecr.io/sampleapp']
     
         steps:
             - name: 'Docker login'
@@ -43,7 +43,7 @@ jobs:
             - name: 'test locally'
               run: |
                 az acr login --name abhiacreastus
-                docker pull abhiacreastus.azurecr.io/vulnerableimage:0.0.1
+                docker pull ${{ matrix.images }}
 
             
             - name: 'Run trivy scanner'
