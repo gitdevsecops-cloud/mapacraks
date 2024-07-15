@@ -23,7 +23,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                images: ['abhiacreastus.azurecr.io/sampleapp']
+                images: ['abhiacreastus.azurecr.io/sampleapp:v1.0.1']
     
         steps:
             - name: 'Docker login'
